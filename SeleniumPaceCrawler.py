@@ -42,7 +42,7 @@ from selenium.webdriver.common.by import By
 import keyboard
 import time
 
-driver = webdriver.Chrome('/Users/Admin/Desktop/Pace/chromedriver')#change to path of chromedriver
+driver = webdriver.Chrome('/Users/Admin/Desktop/Pace/paceprogram/chromedriver')#change to path of chromedriver
 driver.get("http://tmweb.pacebus.com/TMWebWatch/LiveArrivalTimes")
 class route_functions:
     def __init__(self,route,directions):
@@ -66,6 +66,7 @@ class route_functions:
 class route(route_functions):
     def __init__(self,route,directions):
         super().__init__(route,directions)
+        self.result = ""
         for direct in directions:
             self.search('MainContent_routeList_chosen',self.route)
             self.direction(direct)
@@ -73,16 +74,26 @@ class route(route_functions):
             time.sleep(1)
             try:
                 result = driver.find_element(By.ID,"resultBox")
-                self.result = result.text
+                self.result += result.text
             except:
                 print("ERROR: COULD NOT FIND TIME")
+        self.clean_result()
+    def clean_result(self):
+        times = []
+        result = list(self.result.split("\n"))
+        for e in result:
+            if "Scheduled" not in e and "Last" not in e and "Next" not in e:
+                times.append(e)
+        self.times = times
             
-
 route421 = route('421',['East','West'])
 route422 = route('422',['East','West'])
 route423 = route('423',['North','South'])
 
-'''
-route.result isn't filtered yet.
-Will filter when website has all the data on the resultTable
-'''
+print("421:")
+print(route421.times)
+print("422:")
+print(route422.times)
+print("423:")
+print(route423.times)
+
